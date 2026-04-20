@@ -63,8 +63,8 @@ export default function RedeemLogsPage() {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100">
+              <th className="px-4 py-2 border"></th>
               <th className="px-4 py-2 border">Email</th>
-              <th className="px-4 py-2 border">ID</th>
               <th className="px-4 py-2 border">Code</th>
               <th className="px-4 py-2 border">Status</th>
               <th className="px-4 py-2 border">Plan</th>
@@ -74,8 +74,8 @@ export default function RedeemLogsPage() {
           <tbody>
             {logs.map((log) => (
               <tr key={log.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border text-sm">{log.email ?? '—'}</td>
                 <td className="px-4 py-2 border text-center">{log.id}</td>
+                <td className="px-4 py-2 border text-sm">{log.email ?? '—'}</td>
                 <td className="px-4 py-2 border font-mono text-sm">{log.code}</td>
                 <td className="px-4 py-2 border">
                   <span className={`px-2 py-1 rounded text-xs ${
