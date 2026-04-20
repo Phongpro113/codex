@@ -90,8 +90,8 @@ export async function GET(request: NextRequest) {
     if (isNaN(limit) || limit <= 0 || limit > 200) {
       limit = 100
     }
+    
     const allLogs = await prisma.redeemLog.findMany({
-      // select except jsonData
       select: {
         id: true,
         code: true,
@@ -104,17 +104,23 @@ export async function GET(request: NextRequest) {
         activatedEmail: true,
         dateActive: true,
         createdAt: true,
+        jsonData: true,
       },
       orderBy: {
-        createdAt: 'desc' // Sắp xếp mới nhất lên đầu
+        createdAt: 'desc'
       },
       take: limit
     })
-    
-    return NextResponse.json({ 
-      success: true, 
-      data: allLogs,
-      count: allLogs.length 
+
+    const data = allLogs.map(({ jsonData, ...log }) => ({
+      ...log,
+      email: (jsonData as { user?: { email?: string } } | null)?.user?.email ?? null,
+    }))
+
+    return NextResponse.json({
+      success: true,
+      data,
+      count: data.length
     })
     
   } catch (error) {

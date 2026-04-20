@@ -132,7 +132,9 @@ export default function Home() {
       const data = await response.json()
 
       if (data.status === 'activated') {
-        toast.error('Code is activated')
+        toast('Code is activated', {
+          style: { background: 'rgb(64, 108, 30)', color: '#fff', border: 'none' },
+        })
       }
 
       if (data.status === 'Available') {
