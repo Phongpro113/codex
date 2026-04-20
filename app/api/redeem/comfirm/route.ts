@@ -7,7 +7,7 @@ const MAX_ACTIVATE_ATTEMPTS = Math.min(
   120
 )
 
-/** Body from Step 3 — includes raw session JSON string for upstream activate. */
+/** Body from Step 3 — includes raw session JSON string for upstream activate */
 export type RedeemConfirmBody = {
   key: string
   session: string
