@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import ValidateCdkSection from '@/components/ValidateCdkSection'
 import TokenVerificationSection from '@/components/TokenVerificationSection'
 import ConfirmRechargeSection from '@/components/ConfirmRechargeSection'
 import CompletionSection from '@/components/CompletionSection'
 import UsedKeyModal, { type UsedKeyInfo } from '@/components/UsedKeyModal'
+import RechargeHistoryModal from '@/components/RechargeHistoryModal'
 import {
   emptyApiSDKResponse,
   emptyRechargeDetails,
@@ -27,6 +28,21 @@ export default function Home() {
   const [rechargeDetails, setRechargeDetails] = useState<RechargeDetails>(emptyRechargeDetails)
   const [apiSDKResponse, setApiSDKResponse] = useState<ApiSDKResponse>(emptyApiSDKResponse)
   const [usedKeyInfo, setUsedKeyInfo] = useState<UsedKeyInfo | null>(null)
+  const [cookieRecords, setCookieRecords] = useState<UsedKeyInfo[]>([])
+  const [showHistory, setShowHistory] = useState(false)
+
+  function readCookieRecords(): UsedKeyInfo[] {
+    const match = document.cookie.split('; ').find((c) => c.startsWith('redeemRecord='))
+    if (!match) return []
+    try {
+      const parsed = JSON.parse(decodeURIComponent(match.split('=').slice(1).join('=')))
+      return Array.isArray(parsed) ? (parsed as UsedKeyInfo[]) : []
+    } catch { return [] }
+  }
+
+  useEffect(() => {
+    setCookieRecords(readCookieRecords())
+  }, [])
 
   function saveRedeemLogAsync(parsed: SessionJsonShape) {
     void fetch('/api/redeem/logs', {
@@ -44,6 +60,8 @@ export default function Home() {
         date_active: parsed.expires,
         json_data: parsed,
       }),
+    }).then(() => {
+      setCookieRecords(readCookieRecords())
     }).catch((err) => console.error('save redeem log:', err))
   }
 
@@ -182,6 +200,8 @@ export default function Home() {
             success={success}
             onKeyChange={setKey}
             onRedeem={handleRedeem}
+            hasRecord={cookieRecords.length > 0}
+            onShowRecord={() => setShowHistory(true)}
           />
         )}
 
@@ -226,6 +246,10 @@ export default function Home() {
 
       {usedKeyInfo && (
         <UsedKeyModal info={usedKeyInfo} onClose={() => setUsedKeyInfo(null)} />
+      )}
+
+      {showHistory && (
+        <RechargeHistoryModal records={cookieRecords} onClose={() => setShowHistory(false)} />
       )}
     </main>
   )

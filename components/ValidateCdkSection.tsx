@@ -9,6 +9,8 @@ type ValidateCdkSectionProps = {
   success: string;
   onKeyChange: (value: string) => void;
   onRedeem: () => void;
+  hasRecord?: boolean;
+  onShowRecord?: () => void;
 };
 
 export default function ValidateCdkSection({
@@ -18,6 +20,8 @@ export default function ValidateCdkSection({
   success,
   onKeyChange,
   onRedeem,
+  hasRecord,
+  onShowRecord,
 }: ValidateCdkSectionProps) {
   return (
     <section className="mt-6 overflow-hidden rounded-2xl border border-[#e8ebff] bg-white shadow-sm">
@@ -98,6 +102,16 @@ export default function ValidateCdkSection({
             account before activation.
           </p>
         </div>
+
+        {hasRecord && onShowRecord && (
+          <button
+            type="button"
+            onClick={onShowRecord}
+            className="w-full text-center text-sm font-medium text-[#4257ff] hover:underline"
+          >
+            My Recharge Record
+          </button>
+        )}
       </div>
     </section>
   );

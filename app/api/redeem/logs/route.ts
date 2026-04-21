@@ -74,7 +74,22 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ success: true, data: row }, { status: 201 })
+    const email = (body.json_data as { user?: { email?: string } } | null)?.user?.email ?? body.activated_email ?? null
+
+    const newEntry = { code: body.code, email, dateActive: body.date_active ?? null, status: 'Used' }
+    let existing: typeof newEntry[] = []
+    try {
+      const raw = request.cookies.get('redeemRecord')?.value
+      if (raw) existing = JSON.parse(decodeURIComponent(raw)) as typeof newEntry[]
+      if (!Array.isArray(existing)) existing = []
+    } catch { existing = [] }
+    existing.push(newEntry)
+
+    const res = NextResponse.json({ success: true, data: row }, { status: 201 })
+    res.cookies.set('redeemRecord', JSON.stringify(existing), {
+      path: '/', maxAge: 60 * 60 * 24 * 30, sameSite: 'lax',
+    })
+    return res
   } catch (error) {
     console.error('Error creating redeem log:', error)
     return NextResponse.json(
