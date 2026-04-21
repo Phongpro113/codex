@@ -45,7 +45,7 @@ export default function Home() {
   }, [])
 
   function saveRedeemLogAsync(parsed: SessionJsonShape) {
-    void fetch('/api/redeem/logs', {
+    void fetch('/api/redeem/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
