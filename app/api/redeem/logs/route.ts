@@ -61,7 +61,8 @@ export async function POST(request: NextRequest) {
     const row = await prisma.redeemLog.create({
       data: {
         code: body.code,
-        status: body.status,
+        // status: body.status,
+        status: 'Used',
         keyType: body.key_type,
         plan: body.plan,
         term: body.term,

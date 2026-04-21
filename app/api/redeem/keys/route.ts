@@ -1,5 +1,6 @@
 // app/api/redeem/keys/route.ts
 import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 // Interface cho request body
 interface RedeemRequest {
@@ -36,6 +37,17 @@ export async function POST(request: NextRequest) {
         const isSendApi = true
 
         if (isSendApi) {
+            // get key from database
+            const dataKey = await prisma.redeemLog.findFirst({
+                where: {
+                    code: key,
+                },
+            })
+
+            if (dataKey) {
+                return NextResponse.json(dataKey, { status: 400 })
+            }
+            
             // call api to https://opencodex.plus/api/redeem/keys/key
             const response = await fetch(`https://opencodex.plus/api/redeem/keys/${key}`, {
                 method: 'GET', // hoặc POST tùy API yêu cầu

@@ -6,6 +6,7 @@ import ValidateCdkSection from '@/components/ValidateCdkSection'
 import TokenVerificationSection from '@/components/TokenVerificationSection'
 import ConfirmRechargeSection from '@/components/ConfirmRechargeSection'
 import CompletionSection from '@/components/CompletionSection'
+import UsedKeyModal, { type UsedKeyInfo } from '@/components/UsedKeyModal'
 import {
   emptyApiSDKResponse,
   emptyRechargeDetails,
@@ -25,6 +26,7 @@ export default function Home() {
   const [sessionToken, setSessionToken] = useState('')
   const [rechargeDetails, setRechargeDetails] = useState<RechargeDetails>(emptyRechargeDetails)
   const [apiSDKResponse, setApiSDKResponse] = useState<ApiSDKResponse>(emptyApiSDKResponse)
+  const [usedKeyInfo, setUsedKeyInfo] = useState<UsedKeyInfo | null>(null)
 
   function saveRedeemLogAsync(parsed: SessionJsonShape) {
     void fetch('/api/redeem/logs', {
@@ -131,6 +133,14 @@ export default function Home() {
 
       const data = await response.json()
 
+      if (!response.ok && data.code && data.status) {
+        // Key already exists in database
+        const email = (data.jsonData as { user?: { email?: string } } | null)?.user?.email ?? data.activatedEmail ?? null
+        setUsedKeyInfo({ code: data.code, email, dateActive: data.dateActive ?? null, status: data.status })
+        toast.error('key is used')
+        return
+      }
+
       if (data.status === 'activated') {
         toast('Code is activated', {
           style: { background: 'rgb(64, 108, 30)', color: '#fff', border: 'none' },
@@ -213,6 +223,10 @@ export default function Home() {
           />
         )}
       </div>
+
+      {usedKeyInfo && (
+        <UsedKeyModal info={usedKeyInfo} onClose={() => setUsedKeyInfo(null)} />
+      )}
     </main>
   )
 }
