@@ -1,7 +1,7 @@
 // app/dashboard/redeem/logs/page.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 interface RedeemLog {
@@ -19,7 +19,7 @@ interface RedeemLog {
   createdAt: string
 }
 
-export default function RedeemLogsPage() {
+function RedeemLogsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [logs, setLogs] = useState<RedeemLog[]>([])
@@ -157,5 +157,13 @@ export default function RedeemLogsPage() {
         </>
       )}
     </div>
+  )
+}
+
+export default function RedeemLogsPage() {
+  return (
+    <Suspense fallback={<div className="py-8 text-center text-gray-400">Loading...</div>}>
+      <RedeemLogsContent />
+    </Suspense>
   )
 }
